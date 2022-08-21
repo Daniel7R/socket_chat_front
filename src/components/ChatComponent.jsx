@@ -15,7 +15,11 @@ const ChatComponent = () => {
   const socket = useContext(SocketContext);
 
   useEffect(() => {
-    socket.on("typingResponse"), (data) => setTypingStatus(data);
+    try {
+      socket.on("typingResponse"), (data) => setTypingStatus(data);
+    } catch (err) {
+      console.log(err);
+    }
   }, [socket]);
 
   useEffect(() => {
@@ -23,7 +27,11 @@ const ChatComponent = () => {
   }, [messages]);
 
   useEffect(() => {
-    socket.on("messageResponse", (data) => setMessages([...messages, data]));
+    try {
+      socket.on("messageResponse", (data) => setMessages([...messages, data]));
+    } catch (err) {
+      console.log(err);
+    }
   }, [socket, messages]);
 
   return (

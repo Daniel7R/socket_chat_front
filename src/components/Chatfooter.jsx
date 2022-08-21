@@ -13,12 +13,16 @@ const Chatfooter = (props) => {
     e.preventDefault();
 
     if (message.trim() && localStorage.getItem("username")) {
-      socket.emit("message", {
-        text: message,
-        name: localStorage.getItem("username"),
-        id: `${socket.id}${Math.random()}`,
-        socketID: socket.id,
-      });
+      try {
+        socket.emit("message", {
+          text: message,
+          name: localStorage.getItem("username"),
+          id: `${socket.id}${Math.random()}`,
+          socketID: socket.id,
+        });
+      } catch (er) {
+        console.log(err);
+      }
     }
     setMessage("");
   };

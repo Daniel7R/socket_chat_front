@@ -1,10 +1,11 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import { useRouter } from "next/router";
 
+import { SocketContext } from "context/SocketContext";
 import Styles from "../styles/Home.module.css";
 
-const Home = (props) => {
-  const { socket } = props;
+const Home = () => {
+  const socket = useContext(SocketContext);
 
   const router = useRouter();
 
@@ -13,13 +14,17 @@ const Home = (props) => {
   const handleSubmit = (e) => {
     e.preventDefault();
     localStorage.setItem("username", username);
-    socket.emit("newUser", { username, socketID: socket.id });
+    try {
+      socket.emit("newUser", { username, socketID: socket.id });
+    } catch (err) {
+      console.log(err);
+    }
     router.push("/chat");
   };
 
   return (
     <form className={Styles.homeContainer} onSubmit={handleSubmit}>
-      <h2 className={Styles.homeHeader}>Sign in to Open the challenge chat</h2>
+      <h2 className={Styles.homeHeader}>Sign in to open the challenge chat</h2>
       <label htmlFor="username">Username</label>
       <input
         type="text"

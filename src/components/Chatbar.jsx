@@ -4,7 +4,11 @@ const Chatbar = ({ socket, Styles }) => {
   const [users, setUsers] = useState([]);
 
   useEffect(() => {
-    socket.on("newUserResponse", (data) => setUsers(data));
+    try {
+      socket.on("newUserResponse", (data) => setUsers(data));
+    } catch (err) {
+      console.log(err);
+    }
   }, [socket, users]);
 
   return (

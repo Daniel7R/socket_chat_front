@@ -9,10 +9,7 @@ const ChatBody = (props) => {
   const handleLeaveChat = () => {
     localStorage.removeItem("username");
     router.push("/");
-    window.location.reload();
   };
-
-  console.log("M", messages);
 
   return (
     <>
@@ -24,17 +21,24 @@ const ChatBody = (props) => {
       </header>
       <div className={Styles.message__container}>
         {messages.map((message) => {
-          message?.name === localStorage.getItem("username") && (
+          return message?.name === localStorage.getItem("username") ? (
             <div className={Styles.message__chats} key={message?.id}>
               <p className={Styles.sender__name}>You</p>
               <div className={Styles.message__sender}>
-                <p>{message?.text}</p>
+                <p style={{ color: "black" }}>{message?.text}</p>
+              </div>
+            </div>
+          ) : (
+            <div className={Styles.message__chats} key={message?.id}>
+              <p style={{ color: "lightgray" }}>{message?.name}</p>
+              <div className={Styles.message__recipient}>
+                <p style={{ color: "black" }}>{message?.text}</p>
               </div>
             </div>
           );
         })}
         <div className={Styles.message__status}>
-          <p>{typingStatus}</p>
+          {typingStatus !== "" && <p>{typingStatus}</p>}
         </div>
         <div ref={lastMessageRef}></div>
       </div>

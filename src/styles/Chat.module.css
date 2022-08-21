@@ -6,7 +6,7 @@
   }
   .chat__sidebar {
     height: 100%;
-    background-color: #f9f5eb;
+    background-color: #70c1ff;
     flex: 0.2;
     padding: 20px;
     border-right: 1px solid #fdfdfd;
@@ -35,14 +35,14 @@
     align-items: center;
     justify-content: space-between;
     padding: 20px;
-    background-color: #f9f5eb;
+    background-color: #70c1ff;
   }
   .leaveChat__btn {
     padding: 10px;
     width: 150px;
     border: none;
     outline: none;
-    background-color: #d1512d;
+    background-color: #ff3838;
     cursor: pointer;
     color: #eae3d2;
   }
@@ -59,7 +59,7 @@
   }
   .chat__footer {
     padding: 10px;
-    background-color: #f9f5eb;
+    background-color: #70c1ff;
     height: 10vh;
   }
   .form {
@@ -78,20 +78,25 @@
     padding: 15px;
   }
   .sendBtn {
-    width: 150px;
-    background-color: green;
+    width: 130px;
+    background-color: rgb(132, 241, 132);
     padding: 10px;
     border: none;
     outline: none;
     color: #eae3d2;
     cursor: pointer;
+    border-radius: 15px;
+    color: white;
+    font-weight: bold;
+    transition: 1s all ease;
   }
   .sendBtn:hover {
-    background-color: rgb(129, 201, 129);
+    background-color: white;
+    color: rgb(132, 241, 132); 
   }
   .message__recipient {
-    background-color: #f5ccc2;
-    width: 300px;
+    background-color: #bbb9b9;
+    max-width: 300px;
     padding: 10px;
     border-radius: 10px;
     font-size: 15px;
@@ -109,6 +114,7 @@
   }
   .sender__name {
     text-align: right;
+    color: #607eaa;
   }
   .message__status {
     position: fixed;
