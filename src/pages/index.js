@@ -1,7 +1,12 @@
 import React from "react";
 
-import { Home } from "../components";
+import { Home, Seo } from "../components";
 
 export default function main() {
-  return <Home />;
+  return (
+    <>
+      <Seo title={"Main Menu"} />
+      <Home />;
+    </>
+  );
 }

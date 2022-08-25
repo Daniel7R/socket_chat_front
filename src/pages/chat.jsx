@@ -1,9 +1,15 @@
 import React from "react";
 
+import { Seo } from "../components";
 import { ChatComponent } from "../components/ChatComponent";
 
 const chat = () => {
-  return <ChatComponent />;
+  return (
+    <>
+      <Seo title={"Chat"} />
+      <ChatComponent />;
+    </>
+  );
 };
 
 export default chat;
