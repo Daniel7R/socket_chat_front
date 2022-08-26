@@ -1,4 +1,5 @@
 import React, { useContext, useEffect, useRef, useState } from "react";
+import { useRouter } from "next/router";
 
 import { SocketContext } from "../context/SocketContext";
 import { Chatbar } from "./Chatbar";
@@ -10,9 +11,17 @@ const ChatComponent = () => {
   const [messages, setMessages] = useState([]);
   const [typingStatus, setTypingStatus] = useState("");
 
+  const router = useRouter();
+
   const lastMessageRef = useRef(null);
 
   const socket = useContext(SocketContext);
+
+  useEffect(() => {
+    if (localStorage.getItem("username") === null) {
+      router.push("/");
+    }
+  }, []);
 
   useEffect(() => {
     try {
