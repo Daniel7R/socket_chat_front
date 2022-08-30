@@ -18,12 +18,6 @@ const ChatComponent = () => {
   const socket = useContext(SocketContext);
 
   useEffect(() => {
-    if (localStorage.getItem("username") === null) {
-      router.push("/");
-    }
-  }, []);
-
-  useEffect(() => {
     try {
       socket.on("typingResponse"), (data) => setTypingStatus(data);
     } catch (err) {

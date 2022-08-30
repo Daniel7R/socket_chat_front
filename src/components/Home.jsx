@@ -1,27 +1,80 @@
 import React, { useState, useContext } from "react";
 import { useRouter } from "next/router";
 import Image from "next/image";
+import {
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+} from "firebase/auth";
 
+import { AuthContext } from "../context/authContext";
+import { auth } from "../../firebaseConfig";
 import Cats from "../assets/images/cats-keyboard.gif";
 import { SocketContext } from "context/SocketContext";
 import Styles from "../styles/Home.module.css";
 
 const Home = () => {
+  const { activeAuth } = useContext(AuthContext);
+
   const socket = useContext(SocketContext);
 
   const router = useRouter();
 
-  const [username, setUsername] = useState("");
+  //registro
+  const [usernameR, setUsernameR] = useState("");
+  const [passwordR, setPasswordR] = useState("");
+  const [errorR, setErrorR] = useState("");
+  //login
+  const [usernameL, setUsernameL] = useState("");
+  const [passwordL, setPasswordL] = useState("");
+  const [errorL, setErrorL] = useState("");
 
-  const handleSubmit = (e) => {
+  const handleSignUp = (e) => {
     e.preventDefault();
-    localStorage.setItem("username", username);
-    try {
-      socket.emit("newUser", { username, socketID: socket.id });
-    } catch (err) {
-      console.log(err);
-    }
-    router.push("/chat");
+
+    createUserWithEmailAndPassword(auth, usernameR, passwordR)
+      .then(() => {
+        socket.emit("newUser", {
+          username: usernameR,
+          socketID: socket.id,
+        });
+        router.push("/chat");
+      })
+      .then(() => activeAuth())
+      .catch((e) => {
+        if (e.code === "auth/invalid-email") {
+          setErrorR("This email is invalid 😿");
+        }
+        if (e.code === "auth/weak-password") {
+          setErrorR("The password must have at least 6 characters 😿");
+        }
+        if (e.code === "auth/email-already-in-use") {
+          setErrorR("This email is already in use 😿");
+        }
+      });
+  };
+  const handleSignIn = (e) => {
+    e.preventDefault();
+
+    signInWithEmailAndPassword(auth, usernameL, passwordL)
+      .then(() => {
+        socket.emit("newUser", {
+          username: usernameL,
+          socketID: socket.id,
+        });
+        router.push("/chat");
+      })
+      .then(() => activeAuth())
+      .catch((e) => {
+        if (e.code === "auth/user-not-found") {
+          setErrorL("User not found 😿");
+        }
+        if (e.code === "auth/weak-password") {
+          setErrorL("Wrong password 😿");
+        }
+        if (e.code === "auth/invalid-email") {
+          setErrorL("This email is invalid 😿");
+        }
+      });
   };
 
   return (
@@ -34,22 +87,60 @@ const Home = () => {
         margin: "0 auto",
       }}
     >
-      <Image src={Cats} width={300} height={300} />
-      <form className={Styles.homeContainer} onSubmit={handleSubmit}>
+      <Image src={Cats} width={300} height={300} alt="cats" />
+      <form className={Styles.homeContainer} onSubmit={handleSignUp}>
         <h2 className={Styles.homeHeader}>
-          Sign in to open the challenge chat
+          Sign up to open the challenge chat
         </h2>
-        <label htmlFor="username">Username</label>
+        <label htmlFor="username">Email</label>
         <input
           type="text"
           minLength={6}
           name="username"
           id="username"
           className={Styles.usernameInput}
-          value={username}
-          onChange={(e) => setUsername(e.target.value)}
+          value={usernameR}
+          onChange={(e) => setUsernameR(e.target.value)}
         />
-        <button className={Styles.btn}>Sign in</button>
+        <label htmlFor="password">Password</label>
+        <input
+          type="password"
+          minLength={6}
+          name="password"
+          id="password"
+          className={Styles.usernameInput}
+          value={passwordR}
+          onChange={(e) => setPasswordR(e.target.value)}
+        />
+        <button className={Styles.btn}>Sign Up</button>
+        {errorR !== "" && <small color="#ff3838">{errorR}</small>}
+      </form>
+      <form className={Styles.homeContainer} onSubmit={handleSignIn}>
+        <h2 className={Styles.homeHeader}>
+          Sign in to open the challenge chat
+        </h2>
+        <label htmlFor="usernameL">Email</label>
+        <input
+          type="text"
+          minLength={6}
+          name="usernameL"
+          id="usernameL"
+          className={Styles.usernameInput}
+          value={usernameL}
+          onChange={(e) => setUsernameL(e.target.value)}
+        />
+        <label htmlFor="passwordL">Password</label>
+        <input
+          type="password"
+          minLength={6}
+          name="passwordL"
+          id="passwordL"
+          className={Styles.usernameInput}
+          value={passwordL}
+          onChange={(e) => setPasswordL(e.target.value)}
+        />
+        <button className={Styles.btn}>Sign In</button>
+        {errorL !== "" && <small color="#ff3838">{errorL}</small>}
       </form>
     </div>
   );

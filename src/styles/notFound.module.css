@@ -1,0 +1,17 @@
+.linkNotRegistered {
+    color: #fefefe;
+      font-size: 1.2rem ;
+      border: 1px solid transparent;
+      background-color: #1eff00;
+      padding:5px 10px ;
+      transition: 1s all ease;
+      border-radius: 15px;
+      text-decoration: none ;
+  }
+  
+  .linkNotRegistered:hover {
+    color: #fefefe ;
+    background-color: #370FFF;
+    transform: scale(1.09);
+  }
+  

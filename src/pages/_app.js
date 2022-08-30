@@ -1,11 +1,14 @@
 import { SocketProvider } from "context/SocketContext";
+import { AuthContextProvider } from "context/authContext";
 import "../styles/globals.css";
 
 function MyApp({ Component, pageProps }) {
   return (
-    <SocketProvider>
-      <Component {...pageProps} />
-    </SocketProvider>
+    <AuthContextProvider>
+      <SocketProvider>
+        <Component {...pageProps} />
+      </SocketProvider>
+    </AuthContextProvider>
   );
 }
 

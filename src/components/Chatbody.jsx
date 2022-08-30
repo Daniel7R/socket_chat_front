@@ -1,13 +1,18 @@
-import React from "react";
+import React, { useContext } from "react";
 import { useRouter } from "next/router";
+
+import { AuthContext } from "../context/authContext";
+import { auth } from "../../firebaseConfig";
 
 const ChatBody = (props) => {
   const { messages, lastMessageRef, typingStatus, Styles } = props;
 
+  const { removeAuth } = useContext(AuthContext);
+
   const router = useRouter();
 
   const handleLeaveChat = () => {
-    localStorage.removeItem("username");
+    removeAuth();
     router.push("/");
   };
 
@@ -16,12 +21,12 @@ const ChatBody = (props) => {
       <header className={Styles.chat__mainHeader}>
         <p>Chat with Colleagues</p>
         <button className={Styles.leaveChat__btn} onClick={handleLeaveChat}>
-          LEAVE CHANNEL
+          Leave Channel
         </button>
       </header>
       <div className={Styles.message__container}>
         {messages.map((message) => {
-          return message?.name === localStorage.getItem("username") ? (
+          return message?.name === auth.currentUser.email ? (
             <div className={Styles.message__chats} key={message?.id}>
               <p className={Styles.sender__name}>You</p>
               <div className={Styles.message__sender}>
