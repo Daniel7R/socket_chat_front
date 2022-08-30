@@ -27,7 +27,6 @@ const notFound = () => {
           style={{
             fontSize: "3rem",
             textAlign: "center",
-            color: "#ffffff",
           }}
         >
           You are not registered 😿
