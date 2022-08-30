@@ -18,6 +18,8 @@
 .usernameInput {
   padding: 10px;
   width: 50%;
+  border: 1px solid #70c1ff;
+  border-radius: 8px;
 }
 
 .btn {
@@ -25,9 +27,18 @@
   padding: 10px;
   font-size: 16px;
   cursor: pointer;
-  background-color: #607eaa;
-  color: #70c1ff;
+  color: #fefefe;
+  background-color: #70c1ff;
   outline: none;
   border: none;
-  border-radius: 5px;
+  border-radius: 25px;
+  transition: 1s all ease;
+  border: 1px solid transparent;
+}
+
+.btn:hover {
+  transform: scale(1.03);
+  background-color: #fefefe;
+  color: #70c1ff;
+  border-color: #70c1ff;
 }
