@@ -8,20 +8,27 @@ const Chatfooter = (props) => {
 
   const [message, setMessage] = useState("");
 
+  let cUser;
+  if (typeof window !== "undefined") {
+    // Perform localStorage action
+    cUser = localStorage.getItem("user");
+  }
+
   const handleTyping = () => {
-    socket.emit("typing", `${localStorage.getItem("username")} is typing...`);
+    socket.emit("typing", `${localStorage.getItem("user")} is typing...`);
   };
 
   const handleSendMessage = (e) => {
     e.preventDefault();
 
-    if (message.trim() && auth.currentUser) {
+    if (message.trim() && cUser) {
       try {
         socket.emit("message", {
           text: message,
           // name: auth.currentUser.email,
-          id: `${socket.id}${Math.random()}`,
-          socketID: socket.id,
+          name: localStorage.getItem("user"),
+          id: `${socket?.id}${Math.random()}`,
+          socketID: socket?.id,
         });
       } catch (er) {
         console.log(err);

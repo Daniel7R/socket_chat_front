@@ -3,6 +3,11 @@ import React, { createContext, useState } from "react";
 const AuthContext = createContext();
 
 const AuthContextProvider = ({ children }) => {
+  let user;
+  if (typeof window !== "undefined") {
+    // Perform localStorage action
+    const user = localStorage.getItem("user");
+  }
   const _auth = () => {
     user ? true : false;
   };

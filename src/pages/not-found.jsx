@@ -4,7 +4,7 @@ import React from "react";
 import { Seo } from "components";
 import Styles from "../styles/notFound.module.css";
 
-const notFound = () => {
+const NotFound = () => {
   return (
     <>
       <Seo title={"Not Found User"} />
@@ -41,4 +41,4 @@ const notFound = () => {
   );
 };
 
-export default notFound;
+export default NotFound;

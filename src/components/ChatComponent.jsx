@@ -11,8 +11,6 @@ const ChatComponent = () => {
   const [messages, setMessages] = useState([]);
   const [typingStatus, setTypingStatus] = useState("");
 
-  const router = useRouter();
-
   const lastMessageRef = useRef(null);
 
   const socket = useContext(SocketContext);

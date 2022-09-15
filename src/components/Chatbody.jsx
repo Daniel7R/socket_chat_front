@@ -2,7 +2,6 @@ import React, { useContext } from "react";
 import { useRouter } from "next/router";
 
 import { AuthContext } from "../context/authContext";
-// import { auth } from "../../firebaseConfig";
 
 const ChatBody = (props) => {
   const { messages, lastMessageRef, typingStatus, Styles } = props;
@@ -11,7 +10,18 @@ const ChatBody = (props) => {
 
   const router = useRouter();
 
+  let cUser;
+  if (typeof window !== "undefined") {
+    // Perform localStorage action
+    cUser = localStorage.getItem("user");
+  }
+
   const handleLeaveChat = () => {
+    if (typeof window !== "undefined") {
+      // Perform localStorage action
+      localStorage.removeItem("user");
+    }
+    removeAuth();
     router.push("/");
   };
 
@@ -25,7 +35,7 @@ const ChatBody = (props) => {
       </header>
       <div className={Styles.message__container}>
         {messages.map((message) => {
-          return message?.name === auth.currentUser.email ? (
+          return message?.name === cUser ? (
             <div className={Styles.message__chats} key={message?.id}>
               <p className={Styles.sender__name}>You</p>
               <div className={Styles.message__sender}>

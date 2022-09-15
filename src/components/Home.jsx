@@ -22,6 +22,7 @@ import {
   Input,
   IconButton,
   Button,
+  useToast,
 } from "@chakra-ui/react";
 
 import { AuthContext } from "../context/authContext";
@@ -32,6 +33,7 @@ import Styles from "../styles/Home.module.css";
 
 const Home = () => {
   const { activeAuth } = useContext(AuthContext);
+  const toast = useToast();
 
   const socket = useContext(SocketContext);
 
@@ -76,12 +78,18 @@ const Home = () => {
   const handleRegister = (e) => {
     e.preventDefault();
 
-    //Fetch con el RfId
+    //Fetch para el registro
     fetch(
       `${process.env.NEXT_PUBLIC_FLASK_SERVER}register?id=${id}&name=${nombre}&edad=${edad}&genero=${genero}&estrato=${estrato}&departamento=${departamento}&rfid=${rfId}`
     )
       .then((r) => {
         activeAuth();
+        socket.emit("newUser", {
+          username: nombre,
+          socketID: socket?.id,
+        });
+        localStorage.setItem("user", nombre);
+
         r.status === 200 ? router.push("/chat") : console.log(r);
       })
       .catch((e) => {

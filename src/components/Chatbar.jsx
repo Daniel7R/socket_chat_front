@@ -1,13 +1,16 @@
 import React, { useEffect, useState } from "react";
-// import { auth } from "../../firebaseConfig";
 
 const Chatbar = ({ socket, Styles }) => {
   const [users, setUsers] = useState([]);
 
+  let cUser;
+
+  if (typeof window !== "undefined") {
+    cUser = localStorage.getItem("user");
+  }
   useEffect(() => {
     try {
       socket.on("newUserResponse", (data) => setUsers(data));
-      console.log(users);
     } catch (err) {
       console.log(err);
     }
@@ -15,16 +18,18 @@ const Chatbar = ({ socket, Styles }) => {
 
   return (
     <div className={Styles.chat__sidebar}>
-      <h2 style={{ fontWeight: "bold", fontSize: "28px" }}>Challenge 1</h2>
+      <h2 style={{ fontWeight: "bold", fontSize: "28px", color: "#000000" }}>
+        Challenge 1
+      </h2>
 
       <div>
-        <h4 className={Styles.chat__header}>Active Users</h4>
+        <h4 className={Styles.chat__header} style={{ color: "#000000" }}>
+          Active Users
+        </h4>
         <div className={Styles.chat__users}>
           {users.map(
             (user) =>
-              auth.currentUser.email !== user?.username && (
-                <p key={user.socketID}>{user?.username}</p>
-              )
+              user !== cUser && <p key={user?.socketID}>{user?.username}</p>
           )}
         </div>
       </div>
