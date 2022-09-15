@@ -2,7 +2,7 @@ import React, { useContext } from "react";
 import { useRouter } from "next/router";
 
 import { AuthContext } from "../context/authContext";
-import { auth } from "../../firebaseConfig";
+// import { auth } from "../../firebaseConfig";
 
 const ChatBody = (props) => {
   const { messages, lastMessageRef, typingStatus, Styles } = props;
@@ -12,7 +12,6 @@ const ChatBody = (props) => {
   const router = useRouter();
 
   const handleLeaveChat = () => {
-    removeAuth();
     router.push("/");
   };
 

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { auth } from "../../firebaseConfig";
+// import { auth } from "../../firebaseConfig";
 
 const Chatbar = ({ socket, Styles }) => {
   const [users, setUsers] = useState([]);
@@ -13,11 +13,9 @@ const Chatbar = ({ socket, Styles }) => {
     }
   }, [socket, users]);
 
-  console.log(auth.currentUser);
-
   return (
     <div className={Styles.chat__sidebar}>
-      <h2>Challenge 1</h2>
+      <h2 style={{ fontWeight: "bold", fontSize: "28px" }}>Challenge 1</h2>
 
       <div>
         <h4 className={Styles.chat__header}>Active Users</h4>

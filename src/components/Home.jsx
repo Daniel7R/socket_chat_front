@@ -1,10 +1,12 @@
 import React, { useState, useContext } from "react";
 import { useRouter } from "next/router";
 import Image from "next/image";
-import {
-  createUserWithEmailAndPassword,
-  signInWithEmailAndPassword,
-} from "firebase/auth";
+// import {
+//   createUserWithEmailAndPassword,
+//   signInWithEmailAndPassword,
+// } from "firebase/auth";
+import { TbFaceId } from "react-icons/tb";
+import { AiOutlineIdcard } from "react-icons/ai";
 import {
   Accordion,
   AccordionItem,
@@ -12,10 +14,18 @@ import {
   AccordionPanel,
   AccordionIcon,
   Box,
+  Tabs,
+  TabList,
+  Tab,
+  TabPanels,
+  TabPanel,
+  Input,
+  IconButton,
+  Button,
 } from "@chakra-ui/react";
 
 import { AuthContext } from "../context/authContext";
-import { auth } from "../../firebaseConfig";
+
 import Cats from "../assets/images/cats-keyboard.gif";
 import { SocketContext } from "context/SocketContext";
 import Styles from "../styles/Home.module.css";
@@ -28,61 +38,64 @@ const Home = () => {
   const router = useRouter();
 
   //registro
-  const [usernameR, setUsernameR] = useState("");
-  const [passwordR, setPasswordR] = useState("");
-  const [errorR, setErrorR] = useState("");
+  const [id, setId] = useState("");
+  const [nombre, setNombre] = useState("");
+  const [edad, setEdad] = useState("");
+  const [genero, setGenero] = useState("");
+  const [estrato, setEstrato] = useState("");
+  const [departamento, setDepartamento] = useState("");
+  const [rfId, setRfId] = useState("");
+  const [errorR, setErrorR] = useState(false);
   //login
-  const [usernameL, setUsernameL] = useState("");
-  const [passwordL, setPasswordL] = useState("");
   const [errorL, setErrorL] = useState("");
 
   const handleSignUp = (e) => {
     e.preventDefault();
 
-    createUserWithEmailAndPassword(auth, usernameR, passwordR)
-      .then(() => {
-        socket.emit("newUser", {
-          username: usernameR,
-          socketID: socket.id,
-        });
-        router.push("/chat");
-      })
-      .then(() => activeAuth())
-      .catch((e) => {
-        if (e.code === "auth/invalid-email") {
-          setErrorR("This email is invalid 😿");
-        }
-        if (e.code === "auth/weak-password") {
-          setErrorR("The password must have at least 6 characters 😿");
-        }
-        if (e.code === "auth/email-already-in-use") {
-          setErrorR("This email is already in use 😿");
-        }
-      });
+    // createUserWithEmailAndPassword(auth, usernameR, passwordR)
+    //   .then(() => {
+    //     socket.emit("newUser", {
+    //       username: usernameR,
+    //       socketID: socket.id,
+    //     });
+    //     router.push("/chat");
+    //   })
+    //   .then(() => activeAuth())
+    //   .catch((e) => {
+    //     if (e.code === "auth/invalid-email") {
+    //       setErrorR("This email is invalid 😿");
+    //     }
+    //     if (e.code === "auth/weak-password") {
+    //       setErrorR("The password must have at least 6 characters 😿");
+    //     }
+    //     if (e.code === "auth/email-already-in-use") {
+    //       setErrorR("This email is already in use 😿");
+    //     }
+    //   });
   };
-  const handleSignIn = (e) => {
+  const handleRegister = (e) => {
     e.preventDefault();
 
-    signInWithEmailAndPassword(auth, usernameL, passwordL)
-      .then(() => {
-        socket.emit("newUser", {
-          username: usernameL,
-          socketID: socket.id,
-        });
-        router.push("/chat");
+    //Fetch con el RfId
+    fetch(
+      `${process.env.NEXT_PUBLIC_FLASK_SERVER}register?id=${id}&name=${nombre}&edad=${edad}&genero=${genero}&estrato=${estrato}&departamento=${departamento}&rfid=${rfId}`
+    )
+      .then((r) => {
+        activeAuth();
+        r.status === 200 ? router.push("/chat") : console.log(r);
       })
-      .then(() => activeAuth())
       .catch((e) => {
-        if (e.code === "auth/user-not-found") {
-          setErrorL("User not found 😿");
-        }
-        if (e.code === "auth/weak-password") {
-          setErrorL("Wrong password 😿");
-        }
-        if (e.code === "auth/invalid-email") {
-          setErrorL("This email is invalid 😿");
-        }
+        setErrorR("Ha ocurrido un error, verifica todos los campos");
       });
+  };
+
+  const onHandleRfIdSignIn = async () => {
+    await fetch(
+      `${process.env.NEXT_PUBLIC_FLASK_SERVER}login-with-rfid?rfid=01`
+    ).then((r) => {
+      console.log(r);
+      r === "Done" ? router.push("/chat") : console.log(r);
+    });
   };
 
   return (
@@ -107,6 +120,63 @@ const Home = () => {
         Challenge Chat
       </h1>
       <Accordion>
+        <AccordionItem width={"100%"}>
+          <h2>
+            <AccordionButton>
+              <Box flex={1} textAlign="left">
+                Login
+              </Box>
+              <AccordionIcon />
+            </AccordionButton>
+            <AccordionPanel>
+              <h2 className={Styles.homeHeader} style={{ fontWeight: "bold" }}>
+                How do you want to sign in?
+              </h2>
+              <Tabs width={"100%"}>
+                <TabList width={"100%"}>
+                  <Tab textAlign={"left"} width={"50%"}>
+                    <TbFaceId size={30} /> Face recognition
+                  </Tab>
+                  <Tab textAlign={"right"} width={"50%"}>
+                    <AiOutlineIdcard size={30} /> RFID
+                  </Tab>
+                </TabList>
+                <TabPanels>
+                  <TabPanel textAlign={"center"} height="60">
+                    <Button
+                      width={"40"}
+                      height="40"
+                      flex={1}
+                      flexDirection="column"
+                      pb="3"
+                    >
+                      <TbFaceId size={140} />
+                      Request Face access
+                    </Button>
+                  </TabPanel>
+                  <TabPanel textAlign={"center"} height="60">
+                    <form
+                      onSubmit={onHandleRfIdSignIn}
+                      style={{ margin: "0 auto" }}
+                    >
+                      <Input
+                        type={"password"}
+                        placeholder="Here will be your RFid"
+                        value={rfId}
+                        onChange={(e) => setRfId(e.target.value)}
+                        onCopy={false}
+                      />
+                      <Button mt={4}>
+                        <AiOutlineIdcard size={30} />
+                        Sign in with RFid
+                      </Button>
+                    </form>
+                  </TabPanel>
+                </TabPanels>
+              </Tabs>
+            </AccordionPanel>
+          </h2>
+        </AccordionItem>
         <AccordionItem>
           <h2>
             <AccordionButton justifyContent={"space-between"} width={400}>
@@ -119,79 +189,149 @@ const Home = () => {
               <form
                 style={{ border: "4px inset #70c1ff", padding: "20px 20px" }}
                 className={Styles.homeContainer}
-                onSubmit={handleSignUp}
+                onSubmit={handleRegister}
               >
                 <h2 className={Styles.homeHeader}>
                   Sign up to open the challenge chat
                 </h2>
-                <label htmlFor="username">Email</label>
-                <input
+                <label htmlFor="nombre">Nombre</label>
+                <Input
                   type="text"
                   minLength={6}
-                  name="username"
-                  id="username"
+                  name="nombre"
+                  id="nombre"
                   className={`${Styles.usernameInput}`}
-                  value={usernameR}
-                  onChange={(e) => setUsernameR(e.target.value)}
+                  value={nombre}
+                  onChange={(e) => setNombre(e.target.value)}
                 />
-                <label htmlFor="password">Password</label>
-                <input
-                  type="password"
-                  minLength={6}
-                  name="password"
-                  id="password"
-                  className={Styles.usernameInput}
-                  value={passwordR}
-                  onChange={(e) => setPasswordR(e.target.value)}
-                />
+                <div style={{ display: "flex", justifyContent: "center" }}>
+                  <div
+                    style={{
+                      display: "flex",
+                      flexDirection: "column",
+                      alignItems: "center",
+                    }}
+                  >
+                    <label htmlFor="id">Identificación</label>
+                    <Input
+                      type="text"
+                      minLength={6}
+                      name="id"
+                      id="id"
+                      className={`${Styles.usernameInput}`}
+                      value={id}
+                      onChange={(e) => setId(e.target.value)}
+                    />
+                  </div>
+                  <div
+                    style={{
+                      display: "flex",
+                      flexDirection: "column",
+                      alignItems: "center",
+                    }}
+                  >
+                    <label htmlFor="estrato">Estrato</label>
+                    <Input
+                      type="number"
+                      minLength={6}
+                      name="estrato"
+                      id="estrato"
+                      className={`${Styles.usernameInput}`}
+                      value={estrato}
+                      onChange={(e) => setEstrato(e.target.value)}
+                    />
+                  </div>
+                </div>
+                <div style={{ display: "flex", justifyContent: "center" }}>
+                  <div
+                    style={{
+                      display: "flex",
+                      flexDirection: "column",
+                      alignItems: "center",
+                    }}
+                  >
+                    <label htmlFor="edad">Edad</label>
+                    <Input
+                      width={"90%"}
+                      type="number"
+                      name="edad"
+                      id="edad"
+                      className={`${Styles.usernameInput}`}
+                      value={edad}
+                      onChange={(e) => setEdad(e.target.value)}
+                    />
+                  </div>
+                  <div
+                    style={{
+                      display: "flex",
+                      flexDirection: "column",
+                      alignItems: "center",
+                    }}
+                  >
+                    <label htmlFor="genero">Genero</label>
+                    <Input
+                      width={"90%"}
+                      type="text"
+                      name="genero"
+                      id="genero"
+                      className={`${Styles.usernameInput}`}
+                      value={genero}
+                      onChange={(e) => setGenero(e.target.value)}
+                    />
+                  </div>
+                </div>
+                <div style={{ display: "flex", justifyContent: "center" }}>
+                  <div
+                    style={{
+                      display: "flex",
+                      flexDirection: "column",
+                      alignItems: "center",
+                    }}
+                  >
+                    <label htmlFor="departamento">Departamento</label>
+                    <Input
+                      width={"90%"}
+                      type="text"
+                      name="departamento"
+                      id="departamento"
+                      className={`${Styles.usernameInput}`}
+                      value={departamento}
+                      onChange={(e) => setDepartamento(e.target.value)}
+                    />
+                  </div>
+                  <div
+                    style={{
+                      display: "flex",
+                      flexDirection: "column",
+                      alignItems: "center",
+                    }}
+                  >
+                    <label htmlFor="rfid">RFID</label>
+                    <Input
+                      width={"90%"}
+                      type={"password"}
+                      name="rfid"
+                      id="rfid"
+                      placeholder="Here will be your RFid"
+                      value={rfId}
+                      onChange={(e) => setRfId(e.target.value)}
+                      onCopy={false}
+                    />
+                  </div>
+                </div>
+
+                <h3
+                  style={{
+                    textAlign: "center",
+                    marginBottom: "010px",
+                    color: "#A0C1F7",
+                  }}
+                >
+                  Ten en cuenta que en el momento que presiones el botón de
+                  registrar, se te tomará una foto para el reconocimiento facial
+                </h3>
                 <button className={Styles.btn}>Sign Up</button>
                 {errorR !== "" && <small color="#ff3838">{errorR}</small>}
-              </form>
-            </AccordionPanel>
-          </h2>
-        </AccordionItem>
-        <AccordionItem>
-          <h2>
-            <AccordionButton>
-              <Box flex={1} textAlign="left">
-                Login
-              </Box>
-              <AccordionIcon />
-            </AccordionButton>
-            <AccordionPanel>
-              <form
-                style={{ border: "4px outset #70c1ff", padding: "20px 20px" }}
-                className={Styles.homeContainer}
-                onSubmit={handleSignIn}
-              >
-                <h2
-                  className={Styles.homeHeader}
-                  style={{ fontWeight: "bold" }}
-                >
-                  Sign in to open the challenge chat
-                </h2>
-                <label htmlFor="usernameL">Email</label>
-                <input
-                  type="text"
-                  minLength={6}
-                  name="usernameL"
-                  id="usernameL"
-                  className={Styles.usernameInput}
-                  value={usernameL}
-                  onChange={(e) => setUsernameL(e.target.value)}
-                />
-                <label htmlFor="passwordL">Password</label>
-                <input
-                  type="password"
-                  minLength={6}
-                  name="passwordL"
-                  id="passwordL"
-                  className={Styles.usernameInput}
-                  value={passwordL}
-                  onChange={(e) => setPasswordL(e.target.value)}
-                />
-                <button className={Styles.btn}>Sign In</button>
-                {errorL !== "" && <small color="#ff3838">{errorL}</small>}
               </form>
             </AccordionPanel>
           </h2>

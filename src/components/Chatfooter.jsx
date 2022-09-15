@@ -1,7 +1,7 @@
 import React, { useState } from "react";
-import { UserInfo } from "firebase/auth";
+// import { UserInfo } from "firebase/auth";
 
-import { auth } from "../../firebaseConfig";
+// import { auth } from "../../firebaseConfig";
 
 const Chatfooter = (props) => {
   const { socket, Styles } = props;
@@ -19,7 +19,7 @@ const Chatfooter = (props) => {
       try {
         socket.emit("message", {
           text: message,
-          name: auth.currentUser.email,
+          // name: auth.currentUser.email,
           id: `${socket.id}${Math.random()}`,
           socketID: socket.id,
         });
