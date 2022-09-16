@@ -1,10 +1,6 @@
 import React, { useState, useContext } from "react";
 import { useRouter } from "next/router";
 import Image from "next/image";
-// import {
-//   createUserWithEmailAndPassword,
-//   signInWithEmailAndPassword,
-// } from "firebase/auth";
 import { TbFaceId } from "react-icons/tb";
 import { AiOutlineIdcard } from "react-icons/ai";
 import {
@@ -20,9 +16,7 @@ import {
   TabPanels,
   TabPanel,
   Input,
-  IconButton,
   Button,
-  useToast,
 } from "@chakra-ui/react";
 
 import { AuthContext } from "../context/authContext";
@@ -30,10 +24,10 @@ import { AuthContext } from "../context/authContext";
 import Cats from "../assets/images/cats-keyboard.gif";
 import { SocketContext } from "context/SocketContext";
 import Styles from "../styles/Home.module.css";
+import { FormRfidFace } from "./FormRfidFace";
 
 const Home = () => {
   const { activeAuth } = useContext(AuthContext);
-  const toast = useToast();
 
   const socket = useContext(SocketContext);
 
@@ -48,33 +42,10 @@ const Home = () => {
   const [departamento, setDepartamento] = useState("");
   const [rfId, setRfId] = useState("");
   const [errorR, setErrorR] = useState(false);
+  const [errorF, setErrorF] = useState(false);
   //login
   const [errorL, setErrorL] = useState("");
 
-  const handleSignUp = (e) => {
-    e.preventDefault();
-
-    // createUserWithEmailAndPassword(auth, usernameR, passwordR)
-    //   .then(() => {
-    //     socket.emit("newUser", {
-    //       username: usernameR,
-    //       socketID: socket.id,
-    //     });
-    //     router.push("/chat");
-    //   })
-    //   .then(() => activeAuth())
-    //   .catch((e) => {
-    //     if (e.code === "auth/invalid-email") {
-    //       setErrorR("This email is invalid 😿");
-    //     }
-    //     if (e.code === "auth/weak-password") {
-    //       setErrorR("The password must have at least 6 characters 😿");
-    //     }
-    //     if (e.code === "auth/email-already-in-use") {
-    //       setErrorR("This email is already in use 😿");
-    //     }
-    //   });
-  };
   const handleRegister = (e) => {
     e.preventDefault();
 
@@ -82,6 +53,7 @@ const Home = () => {
     fetch(
       `${process.env.NEXT_PUBLIC_FLASK_SERVER}register?id=${id}&name=${nombre}&edad=${edad}&genero=${genero}&estrato=${estrato}&departamento=${departamento}&rfid=${rfId}`
     )
+      .then((r) => r.json())
       .then((r) => {
         activeAuth();
         socket.emit("newUser", {
@@ -90,7 +62,7 @@ const Home = () => {
         });
         localStorage.setItem("user", nombre);
 
-        r.status === 200 ? router.push("/chat") : console.log(r);
+        r.status === "Done" ? router.push("/chat") : console.log(r);
       })
       .catch((e) => {
         setErrorR("Ha ocurrido un error, verifica todos los campos");
@@ -140,48 +112,17 @@ const Home = () => {
               <h2 className={Styles.homeHeader} style={{ fontWeight: "bold" }}>
                 How do you want to sign in?
               </h2>
-              <Tabs width={"100%"}>
-                <TabList width={"100%"}>
-                  <Tab textAlign={"left"} width={"50%"}>
-                    <TbFaceId size={30} /> Face recognition
-                  </Tab>
-                  <Tab textAlign={"right"} width={"50%"}>
-                    <AiOutlineIdcard size={30} /> RFID
-                  </Tab>
-                </TabList>
-                <TabPanels>
-                  <TabPanel textAlign={"center"} height="60">
-                    <Button
-                      width={"40"}
-                      height="40"
-                      flex={1}
-                      flexDirection="column"
-                      pb="3"
-                    >
-                      <TbFaceId size={140} />
-                      Request Face access
-                    </Button>
-                  </TabPanel>
-                  <TabPanel textAlign={"center"} height="60">
-                    <form
-                      onSubmit={onHandleRfIdSignIn}
-                      style={{ margin: "0 auto" }}
-                    >
-                      <Input
-                        type={"password"}
-                        placeholder="Here will be your RFid"
-                        value={rfId}
-                        onChange={(e) => setRfId(e.target.value)}
-                        onCopy={false}
-                      />
-                      <Button mt={4}>
-                        <AiOutlineIdcard size={30} />
-                        Sign in with RFid
-                      </Button>
-                    </form>
-                  </TabPanel>
-                </TabPanels>
-              </Tabs>
+              <FormRfidFace
+                activeAuth={activeAuth}
+                socket={socket}
+                errorL={errorL}
+                setErrorL={setErrorL}
+                errorF={errorF}
+                setErrorF={setErrorF}
+                rfId={rfId}
+                setRfId={setRfId}
+                router={router}
+              />
             </AccordionPanel>
           </h2>
         </AccordionItem>

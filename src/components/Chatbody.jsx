@@ -1,12 +1,26 @@
 import React, { useContext } from "react";
 import { useRouter } from "next/router";
+import {
+  Modal,
+  ModalOverlay,
+  ModalContent,
+  ModalHeader,
+  ModalFooter,
+  ModalBody,
+  ModalCloseButton,
+  Button,
+  useDisclosure,
+} from "@chakra-ui/react";
 
 import { AuthContext } from "../context/authContext";
+import { FormRfidFace } from "./FormRfidFace";
 
 const ChatBody = (props) => {
   const { messages, lastMessageRef, typingStatus, Styles } = props;
 
   const { removeAuth } = useContext(AuthContext);
+
+  const { isOpen, onOpen, onClose } = useDisclosure();
 
   const router = useRouter();
 
@@ -17,6 +31,7 @@ const ChatBody = (props) => {
   }
 
   const handleLeaveChat = () => {
+    fetch(`${process.env.NEXT_PUBLIC_FLASK_SERVER}`);
     if (typeof window !== "undefined") {
       // Perform localStorage action
       localStorage.removeItem("user");
@@ -28,10 +43,22 @@ const ChatBody = (props) => {
   return (
     <>
       <header className={Styles.chat__mainHeader}>
-        <p>Chat with Colleagues</p>
-        <button className={Styles.leaveChat__btn} onClick={handleLeaveChat}>
+        <p style={{ color: "#3b3b3b", fontWeight: "bold" }}>
+          Chat with Colleagues
+        </p>
+        <Button
+          _hover={{ opacity: "0.5" }}
+          bg="#ff3838"
+          className={Styles.leaveChat__btn}
+          onClick={onOpen}
+        >
           Leave Channel
-        </button>
+        </Button>
+        <Modalcito
+          isOpen={isOpen}
+          onClose={onClose}
+          handleLeaveChat={handleLeaveChat}
+        ></Modalcito>
       </header>
       <div className={Styles.message__container}>
         {messages.map((message) => {
@@ -59,5 +86,34 @@ const ChatBody = (props) => {
     </>
   );
 };
+
+const Modalcito = ({ isOpen, onClose, handleLeaveChat }) => (
+  <Modal isOpen={isOpen} onClose={onClose}>
+    <ModalOverlay />
+    <ModalContent>
+      <ModalHeader>Closing the App</ModalHeader>
+      <ModalCloseButton />
+      <ModalBody>
+        <FormRfidFace />
+      </ModalBody>
+
+      <ModalFooter>
+        <Button colorScheme="blue" mr={3} onClick={onClose}>
+          Close
+        </Button>
+        <Button
+          _hover={{
+            opacity: "0.6",
+          }}
+          bg={"#26ff95"}
+          color="blackAlpha.900"
+          onClick={handleLeaveChat}
+        >
+          Secondary Action
+        </Button>
+      </ModalFooter>
+    </ModalContent>
+  </Modal>
+);
 
 export { ChatBody };
