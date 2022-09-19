@@ -106,6 +106,7 @@ const Home = () => {
     e.preventDefault();
 
     //Fetch para el registro
+
     fetch(
       `${process.env.NEXT_PUBLIC_FLASK_SERVER}register?id=${id}&name=${nombre}&edad=${edad}&genero=${genero}&estrato=${estrato}&departamento=${departamento}&rfid=${rfId}`
     )
