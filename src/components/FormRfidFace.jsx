@@ -70,7 +70,7 @@ export const FormRfidFace = (props) => {
             {errorF !== "" && <small color="#ff3838">{errorF}</small>}
           </TabPanel>
           <TabPanel textAlign={"center"} height="60">
-            <form onSubmit={actionRfid} style={{ margin: "0 auto" }}>
+            <form style={{ margin: "0 auto" }}>
               <Input
                 type={"password"}
                 placeholder="Here will be your RFid"
@@ -84,6 +84,7 @@ export const FormRfidFace = (props) => {
                 style={{
                   transition: "1s all ease",
                 }}
+                onClick={actionRfid}
               >
                 <AiOutlineIdcard size={30} />
                 {text}

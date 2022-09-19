@@ -26,7 +26,6 @@ const ChatBody = (props) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
 
   const [disabled, setDisabled] = useState(true);
-  const [errorR, setErrorR] = useState(false);
   const [errorF, setErrorF] = useState(false);
   const [rfId, setRfId] = useState("");
   //login
@@ -45,8 +44,8 @@ const ChatBody = (props) => {
       .then((r) => r.json())
       .then((r) => r?.status === "ok" && setDisabled(!disabled));
   };
-  const handleLeaveChatRfId = () => {
-    console.log("a");
+  const handleLeaveChatRfId = (e) => {
+    e.preventDefault();
     fetch(
       `${process.env.NEXT_PUBLIC_FLASK_SERVER}logout-with-rfid?rfid=${rfId}`
     )
@@ -78,7 +77,7 @@ const ChatBody = (props) => {
           onClose={onClose}
           disabled={disabled}
           handleLeaveChatFace={handleLeaveChatFace}
-          handleLeaveChatRfid={handleLeaveChatRfId}
+          handleLeaveChatRfId={handleLeaveChatRfId}
           confirm={confirmLeaving}
           socket={socket}
           setErrorL={setErrorL}

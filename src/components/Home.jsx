@@ -125,15 +125,6 @@ const Home = () => {
       });
   };
 
-  const onHandleRfIdSignIn = async () => {
-    await fetch(
-      `${process.env.NEXT_PUBLIC_FLASK_SERVER}login-with-rfid?rfid=01`
-    ).then((r) => {
-      console.log(r);
-      r === "Done" ? router.push("/chat") : console.log(r);
-    });
-  };
-
   return (
     <div
       style={{
