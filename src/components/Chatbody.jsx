@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+import React, { useContext, useState } from "react";
 import { useRouter } from "next/router";
 import {
   Modal,
@@ -13,14 +13,24 @@ import {
 } from "@chakra-ui/react";
 
 import { AuthContext } from "../context/authContext";
+import { SocketContext } from "context/SocketContext";
 import { FormRfidFace } from "./FormRfidFace";
 
 const ChatBody = (props) => {
   const { messages, lastMessageRef, typingStatus, Styles } = props;
 
+  const socket = useContext(SocketContext);
+
   const { removeAuth } = useContext(AuthContext);
 
   const { isOpen, onOpen, onClose } = useDisclosure();
+
+  const [disabled, setDisabled] = useState(true);
+  const [errorR, setErrorR] = useState(false);
+  const [errorF, setErrorF] = useState(false);
+  const [rfId, setRfId] = useState("");
+  //login
+  const [errorL, setErrorL] = useState("");
 
   const router = useRouter();
 
@@ -30,16 +40,25 @@ const ChatBody = (props) => {
     cUser = localStorage.getItem("user");
   }
 
-  const handleLeaveChat = () => {
-    fetch(`${process.env.NEXT_PUBLIC_FLASK_SERVER}`);
-    if (typeof window !== "undefined") {
-      // Perform localStorage action
-      localStorage.removeItem("user");
-    }
+  const handleLeaveChatFace = () => {
+    fetch(`${process.env.NEXT_PUBLIC_FLASK_SERVER}logout-with-face`)
+      .then((r) => r.json())
+      .then((r) => r?.status === "ok" && setDisabled(!disabled));
+  };
+  const handleLeaveChatRfId = () => {
+    console.log("a");
+    fetch(
+      `${process.env.NEXT_PUBLIC_FLASK_SERVER}logout-with-rfid?rfid=${rfId}`
+    )
+      .then((r) => r.json())
+      .then((r) => r?.status === "ok" && setDisabled(!disabled));
+  };
+
+  const confirmLeaving = () => {
+    localStorage.removeItem("user");
     removeAuth();
     router.push("/");
   };
-
   return (
     <>
       <header className={Styles.chat__mainHeader}>
@@ -57,7 +76,18 @@ const ChatBody = (props) => {
         <Modalcito
           isOpen={isOpen}
           onClose={onClose}
-          handleLeaveChat={handleLeaveChat}
+          disabled={disabled}
+          handleLeaveChatFace={handleLeaveChatFace}
+          handleLeaveChatRfid={handleLeaveChatRfId}
+          confirm={confirmLeaving}
+          socket={socket}
+          setErrorL={setErrorL}
+          setErrorF={setErrorF}
+          errorL={errorL}
+          errorF={errorF}
+          rfId={rfId}
+          setRfId={setRfId}
+          router={router}
         ></Modalcito>
       </header>
       <div className={Styles.message__container}>
@@ -87,14 +117,42 @@ const ChatBody = (props) => {
   );
 };
 
-const Modalcito = ({ isOpen, onClose, handleLeaveChat }) => (
+const Modalcito = ({
+  isOpen,
+  onClose,
+  disabled,
+  confirm,
+  handleLeaveChatFace,
+  handleLeaveChatRfId,
+  socket,
+  errorL,
+  errorF,
+  setErrorL,
+  setErrorF,
+  rfId,
+  setRfId,
+  router,
+}) => (
   <Modal isOpen={isOpen} onClose={onClose}>
     <ModalOverlay />
     <ModalContent>
       <ModalHeader>Closing the App</ModalHeader>
       <ModalCloseButton />
       <ModalBody>
-        <FormRfidFace />
+        <FormRfidFace
+          socket={socket}
+          errorL={errorL}
+          setErrorL={setErrorL}
+          errorF={errorF}
+          setErrorF={setErrorF}
+          rfId={rfId}
+          setRfId={setRfId}
+          router={router}
+          text={"Log out"}
+          faceText={"Logout with face"}
+          actionRfid={handleLeaveChatRfId}
+          actionFace={handleLeaveChatFace}
+        />
       </ModalBody>
 
       <ModalFooter>
@@ -105,11 +163,12 @@ const Modalcito = ({ isOpen, onClose, handleLeaveChat }) => (
           _hover={{
             opacity: "0.6",
           }}
-          bg={"#26ff95"}
+          disabled={disabled}
+          bg={"#f15757"}
           color="blackAlpha.900"
-          onClick={handleLeaveChat}
+          onClick={confirm}
         >
-          Secondary Action
+          Confirmar
         </Button>
       </ModalFooter>
     </ModalContent>

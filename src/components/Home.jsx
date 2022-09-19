@@ -10,13 +10,8 @@ import {
   AccordionPanel,
   AccordionIcon,
   Box,
-  Tabs,
-  TabList,
-  Tab,
-  TabPanels,
-  TabPanel,
   Input,
-  Button,
+  useDisclosure,
 } from "@chakra-ui/react";
 
 import { AuthContext } from "../context/authContext";
@@ -45,6 +40,67 @@ const Home = () => {
   const [errorF, setErrorF] = useState(false);
   //login
   const [errorL, setErrorL] = useState("");
+
+  const { isOpen, onClose, onOpen } = useDisclosure();
+
+  const [user, setUser] = React.useState("");
+  const [header, setHeader] = React.useState("");
+
+  const handleLoginWithRfid = (e) => {
+    e.preventDefault();
+
+    fetch(`${process.env.NEXT_PUBLIC_FLASK_SERVER}login-with-rfid?rfid=${rfId}`)
+      .then((r) => r.json())
+      .then((r) => {
+        if (r?.status === "ok") {
+          activeAuth();
+          socket.emit("newUser", {
+            username: r?.data,
+            socketID: socket?.id,
+          });
+
+          setHeader("Welcome");
+          onOpen();
+          setTimeout(() => {
+            router.push("/chat");
+          }, 2500);
+          localStorage.setItem("user", nombre);
+        } else {
+          setHeader("Error");
+          setErrorL(r?.status);
+        }
+      });
+  };
+
+  const handleLoginWithFace = (e) => {
+    e.preventDefault();
+
+    fetch(`${process.env.NEXT_PUBLIC_FLASK_SERVER}login-with-face`)
+      .then((r) => r.json())
+      .then((r) => {
+        if (r?.status === "ok") {
+          setUser(r?.data);
+          activeAuth();
+          socket.emit("newUser", {
+            username: r?.data,
+            socketID: socket?.id,
+          });
+          setHeader("Welcome");
+          localStorage.setItem("user", nombre);
+          onOpen();
+          setTimeout(() => {
+            router.push("/chat");
+          }, 2500);
+        } else {
+          setHeader("Error");
+          onOpen();
+        }
+      })
+
+      .catch((r) => {
+        setErrorF(r?.status);
+      });
+  };
 
   const handleRegister = (e) => {
     e.preventDefault();
@@ -122,6 +178,16 @@ const Home = () => {
                 rfId={rfId}
                 setRfId={setRfId}
                 router={router}
+                text={"Sign in with RFid"}
+                faceText="Request Face access"
+                user={user}
+                setUser={setUser}
+                header={header}
+                actionRfid={handleLoginWithRfid}
+                actionFace={handleLoginWithFace}
+                onOpen={onOpen}
+                isOpen={isOpen}
+                onClose={onClose}
               />
             </AccordionPanel>
           </h2>
