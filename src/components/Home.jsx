@@ -87,7 +87,8 @@ const Home = () => {
       method: "GET",
       mode: "cors",
       headers: {
-        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Origin": process.env.NEXT_PUBLIC_FLASK_SERVER,
+        "Content-Type": "application/json",
       },
     })
       .then((r) => r.json())
@@ -127,7 +128,8 @@ const Home = () => {
         method: "GET",
         mode: "cors",
         headers: {
-          "Access-Control-Allow-Origin": "*",
+          "Access-Control-Allow-Origin": process.env.NEXT_PUBLIC_FLASK_SERVER,
+          "Content-Type": "application/json",
         },
       }
     )
