@@ -211,7 +211,6 @@ const Home = () => {
               <form
                 style={{ border: "4px inset #70c1ff", padding: "20px 20px" }}
                 className={Styles.homeContainer}
-                onSubmit={handleRegister}
               >
                 <h2 className={Styles.homeHeader}>
                   Sign up to open the challenge chat
@@ -352,7 +351,9 @@ const Home = () => {
                   Ten en cuenta que en el momento que presiones el botón de
                   registrar, se te tomará una foto para el reconocimiento facial
                 </h3>
-                <button className={Styles.btn}>Sign Up</button>
+                <button onClick={handleRegister} className={Styles.btn}>
+                  Sign Up
+                </button>
                 {errorR !== "" && <small color="#ff3838">{errorR}</small>}
               </form>
             </AccordionPanel>
