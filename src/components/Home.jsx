@@ -83,7 +83,13 @@ const Home = () => {
   const handleLoginWithFace = (e) => {
     e.preventDefault();
 
-    fetch(`${process.env.NEXT_PUBLIC_FLASK_SERVER}login-with-face`)
+    fetch(`${process.env.NEXT_PUBLIC_FLASK_SERVER}login-with-face`, {
+      method: "GET",
+      mode: "cors",
+      headers: {
+        "Access-Control-Allow-Origin": "*",
+      },
+    })
       .then((r) => r.json())
       .then((r) => {
         if (r?.status === "ok") {
