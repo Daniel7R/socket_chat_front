@@ -52,9 +52,11 @@ const Home = () => {
     fetch(
       `${process.env.NEXT_PUBLIC_FLASK_SERVER}login-with-rfid?rfid=${rfId}`,
       {
-        mode: "cors",
+        method: "GET",
+        mode: "no-cors",
         headers: {
-          "Access-Control-Allow-Origin": "*",
+          "Access-Control-Allow-Origin": process.env.NEXT_PUBLIC_FLASK_SERVER,
+          "Content-Type": "application/json",
         },
       }
     )
@@ -85,7 +87,7 @@ const Home = () => {
 
     fetch(`${process.env.NEXT_PUBLIC_FLASK_SERVER}login-with-face`, {
       method: "GET",
-      mode: "cors",
+      mode: "no-cors",
       headers: {
         "Access-Control-Allow-Origin": process.env.NEXT_PUBLIC_FLASK_SERVER,
         "Content-Type": "application/json",
@@ -126,7 +128,7 @@ const Home = () => {
       `${process.env.NEXT_PUBLIC_FLASK_SERVER}register?id=${id}&name=${nombre}&edad=${edad}&genero=${genero}&estrato=${estrato}&departamento=${departamento}&rfid=${rfId}`,
       {
         method: "GET",
-        mode: "cors",
+        mode: "no-cors",
         headers: {
           "Access-Control-Allow-Origin": process.env.NEXT_PUBLIC_FLASK_SERVER,
           "Content-Type": "application/json",
