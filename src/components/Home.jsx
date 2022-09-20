@@ -52,6 +52,8 @@ const Home = () => {
     fetch(
       `${process.env.NEXT_PUBLIC_FLASK_SERVER}login-with-rfid?rfid=${rfId}`,
       {
+        mode: "cors",
+        method: "GET",
         headers: {
           "Access-Control-Allow-Origin": "*",
         },
