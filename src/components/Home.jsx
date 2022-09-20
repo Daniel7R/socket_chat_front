@@ -49,7 +49,14 @@ const Home = () => {
   const handleLoginWithRfid = (e) => {
     e.preventDefault();
 
-    fetch(`${process.env.NEXT_PUBLIC_FLASK_SERVER}login-with-rfid?rfid=${rfId}`)
+    fetch(
+      `${process.env.NEXT_PUBLIC_FLASK_SERVER}login-with-rfid?rfid=${rfId}`,
+      {
+        headers: {
+          "Access-Control-Allow-Origin": "*",
+        },
+      }
+    )
       .then((r) => r.json())
       .then((r) => {
         if (r?.status === "ok") {
