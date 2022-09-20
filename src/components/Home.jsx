@@ -53,7 +53,6 @@ const Home = () => {
       `${process.env.NEXT_PUBLIC_FLASK_SERVER}login-with-rfid?rfid=${rfId}`,
       {
         mode: "cors",
-        method: "GET",
         headers: {
           "Access-Control-Allow-Origin": "*",
         },
@@ -117,7 +116,13 @@ const Home = () => {
     //Fetch para el registro
 
     fetch(
-      `${process.env.NEXT_PUBLIC_FLASK_SERVER}register?id=${id}&name=${nombre}&edad=${edad}&genero=${genero}&estrato=${estrato}&departamento=${departamento}&rfid=${rfId}`
+      `${process.env.NEXT_PUBLIC_FLASK_SERVER}register?id=${id}&name=${nombre}&edad=${edad}&genero=${genero}&estrato=${estrato}&departamento=${departamento}&rfid=${rfId}`,
+      {
+        mode: "cors",
+        headers: {
+          "Access-Control-Allow-Origin": "*",
+        },
+      }
     )
       .then((r) => r.json())
       .then((r) => {
