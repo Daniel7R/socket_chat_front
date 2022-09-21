@@ -49,50 +49,35 @@ const Home = () => {
   const handleLoginWithRfid = (e) => {
     e.preventDefault();
 
-    fetch(
-      `${process.env.NEXT_PUBLIC_FLASK_SERVER}login-with-rfid?rfid=${rfId}`,
-      {
-        method: "GET",
-        mode: "no-cors",
-        headers: {
-          "Access-Control-Allow-Origin": process.env.NEXT_PUBLIC_FLASK_SERVER,
-          "Content-Type": "application/json",
-        },
-      }
-    )
+    fetch(`${process.env.NEXT_PUBLIC_FLASK_SERVER}login-with-rfid?rfid=${rfId}`)
       .then((r) => r.json())
       .then((r) => {
+        console.log(r);
         if (r?.status === "ok") {
+          setUser(r?.data);
           activeAuth();
           socket.emit("newUser", {
             username: r?.data,
             socketID: socket?.id,
           });
-
+          localStorage.setItem("user", r?.data);
           setHeader("Welcome");
           onOpen();
           setTimeout(() => {
             router.push("/chat");
           }, 2500);
-          localStorage.setItem("user", nombre);
         } else {
           setHeader("Error");
           setErrorL(r?.status);
         }
-      });
+      })
+      .catch((r) => console.log(r));
   };
 
   const handleLoginWithFace = (e) => {
     e.preventDefault();
 
-    fetch(`${process.env.NEXT_PUBLIC_FLASK_SERVER}login-with-face`, {
-      method: "GET",
-      mode: "no-cors",
-      headers: {
-        "Access-Control-Allow-Origin": process.env.NEXT_PUBLIC_FLASK_SERVER,
-        "Content-Type": "application/json",
-      },
-    })
+    fetch(`${process.env.NEXT_PUBLIC_FLASK_SERVER}login-with-face`)
       .then((r) => r.json())
       .then((r) => {
         if (r?.status === "ok") {
@@ -103,7 +88,7 @@ const Home = () => {
             socketID: socket?.id,
           });
           setHeader("Welcome");
-          localStorage.setItem("user", nombre);
+          localStorage.setItem("user", r?.data);
           onOpen();
           setTimeout(() => {
             router.push("/chat");
@@ -125,15 +110,7 @@ const Home = () => {
     //Fetch para el registro
 
     fetch(
-      `${process.env.NEXT_PUBLIC_FLASK_SERVER}register?id=${id}&name=${nombre}&edad=${edad}&genero=${genero}&estrato=${estrato}&departamento=${departamento}&rfid=${rfId}`,
-      {
-        method: "GET",
-        mode: "no-cors",
-        headers: {
-          "Access-Control-Allow-Origin": process.env.NEXT_PUBLIC_FLASK_SERVER,
-          "Content-Type": "application/json",
-        },
-      }
+      `${process.env.NEXT_PUBLIC_FLASK_SERVER}register?id=${id}&name=${nombre}&edad=${edad}&genero=${genero}&estrato=${estrato}&departamento=${departamento}&rfid=${rfId}`
     )
       .then((r) => r.json())
       .then((r) => {
@@ -374,3 +351,14 @@ const Home = () => {
   );
 };
 export { Home };
+
+//Headers
+
+// {
+//   method: "GET",
+//   mode: "no-cors",
+//   headers: {
+//     "Access-Control-Allow-Origin": process.env.NEXT_PUBLIC_FLASK_SERVER,
+//     "Content-Type": "application/json",
+//   },
+// }

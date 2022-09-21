@@ -26,7 +26,7 @@ const Chatfooter = (props) => {
         socket.emit("message", {
           text: message,
           // name: auth.currentUser.email,
-          name: localStorage.getItem("user"),
+          name: cUser,
           id: `${socket?.id}${Math.random()}`,
           socketID: socket?.id,
         });
@@ -46,7 +46,7 @@ const Chatfooter = (props) => {
           className={Styles.message}
           value={message}
           onChange={(e) => setMessage(e.target.value)}
-          onKeyDown={handleTyping}
+          onKeyUp={handleTyping}
         />
         <button className={Styles.sendBtn}>Sent</button>
       </form>

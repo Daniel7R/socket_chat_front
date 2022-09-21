@@ -17,7 +17,7 @@ const ChatComponent = () => {
 
   useEffect(() => {
     try {
-      socket.on("typingResponse"), (data) => setTypingStatus(data);
+      socket.on("typingResponse", (data) => setTypingStatus(data));
     } catch (err) {
       console.log(err);
     }
@@ -44,6 +44,7 @@ const ChatComponent = () => {
           lastMessageRef={lastMessageRef}
           messages={messages}
           typingStatus={typingStatus}
+          setTypingStatus={setTypingStatus}
         />
         <Chatfooter Styles={Styles} socket={socket} />
       </div>

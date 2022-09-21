@@ -1,4 +1,4 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import {
   Modal,
@@ -17,7 +17,14 @@ import { SocketContext } from "context/SocketContext";
 import { FormRfidFace } from "./FormRfidFace";
 
 const ChatBody = (props) => {
-  const { messages, lastMessageRef, typingStatus, Styles } = props;
+  const { messages, lastMessageRef, typingStatus, Styles, setTypingStatus } =
+    props;
+
+  useEffect(() => {
+    setTimeout(() => {
+      setTypingStatus("");
+    }, 2000);
+  }, [typingStatus]);
 
   const socket = useContext(SocketContext);
 
@@ -107,8 +114,12 @@ const ChatBody = (props) => {
             </div>
           );
         })}
-        <div className={Styles.message__status}>
-          {typingStatus !== "" && <p>{typingStatus}</p>}
+        <div className={Styles.message__status} style={{ marginTop: "-20px" }}>
+          {typingStatus !== "" && (
+            <p style={{ marginTop: "-80px", color: "#e78888" }}>
+              {typingStatus}
+            </p>
+          )}
         </div>
         <div ref={lastMessageRef}></div>
       </div>
