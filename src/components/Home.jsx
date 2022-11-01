@@ -166,6 +166,7 @@ const Home = () => {
         headers: {
           "Content-type": "application/json",
           "Access-Control-Allow-Origin": "*",
+          mode: "no-cors",
         },
         body: JSON.stringify(fieldsRegister),
       })
