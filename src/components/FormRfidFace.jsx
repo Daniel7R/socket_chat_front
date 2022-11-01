@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useCallback, useState, useRef } from "react";
 import {
   Tabs,
   TabList,
@@ -13,27 +13,24 @@ import { TbFaceId } from "react-icons/tb";
 import { AiOutlineIdcard } from "react-icons/ai";
 
 import { ModalLogin } from "./ModalLogin";
+import { WebcamCapture } from "./WebcamCapture";
 
 export const FormRfidFace = (props) => {
   const {
-    activeAuth,
-    socket,
-    router,
     errorL,
-    setErrorL,
     errorF,
-    setErrorF,
-    rfId,
-    setRfId,
+    webcamRef,
+    capture,
     text,
     faceText,
     user,
-    setUser,
     header,
     actionRfid,
     actionFace,
     isOpen,
     onClose,
+    rfId,
+    setRfId,
   } = props;
 
   return (
@@ -48,20 +45,39 @@ export const FormRfidFace = (props) => {
           </Tab>
         </TabList>
         <TabPanels>
-          <TabPanel textAlign={"center"} height="60">
+          <TabPanel
+            textAlign={"center"}
+            display={"flex"}
+            flexDirection="column"
+            margin={"0 auto"}
+            height="60"
+          >
+            <WebcamCapture webcamRef={webcamRef} />
             <Button
-              width={"40"}
-              height="40"
+              width={"220px"}
+              height={"300px"}
+              margin={"0 auto"}
               flex={1}
               flexDirection="column"
               pb="3"
-              onClick={actionFace}
+              onClick={async (e) => {
+                e.preventDefault();
+                capture();
+
+                return new Promise((resolve, reject) => {
+                  resolve(capture());
+                })
+                  .then(() => capture())
+                  .then(() => actionFace());
+              }}
               _hover={{
                 color: "#57b3ed",
                 backgroundColor: "#fefefe",
               }}
               style={{
                 transition: "1s all ease",
+                background: "#57b3ed",
+                color: "#fefefe",
               }}
             >
               <TbFaceId size={140} />

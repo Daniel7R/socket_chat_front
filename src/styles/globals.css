@@ -15,6 +15,18 @@ a {
   box-sizing: border-box;
 }
 
+#cContainer > div> video {
+  position: static;
+  border-radius: 8px;
+}
+
+video {
+  position: absolute;
+  left: 0;
+  right: 0;
+  margin: 0 auto;
+}
+
 @media (prefers-color-scheme: dark) {
   html {
     color-scheme: dark;

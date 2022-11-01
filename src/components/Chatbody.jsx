@@ -1,4 +1,10 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, {
+  useContext,
+  useEffect,
+  useState,
+  useRef,
+  useCallback,
+} from "react";
 import { useRouter } from "next/router";
 import {
   Modal,
@@ -26,6 +32,16 @@ const ChatBody = (props) => {
     }, 2000);
   }, [typingStatus]);
 
+  //Webcam
+  const [image, setImage] = useState("");
+
+  const webcamRef = useRef(null);
+
+  const capture = useCallback(() => {
+    const imageSrc = webcamRef.current.getScreenshot();
+    setImage(imageSrc);
+  }, [webcamRef]);
+
   const socket = useContext(SocketContext);
 
   const { removeAuth } = useContext(AuthContext);
@@ -46,16 +62,29 @@ const ChatBody = (props) => {
     cUser = localStorage.getItem("user");
   }
 
-  const handleLeaveChatFace = () => {
-    fetch(`${process.env.NEXT_PUBLIC_FLASK_SERVER}logout-with-face`)
-      .then((r) => r.json())
-      .then((r) => r?.status === "ok" && setDisabled(!disabled));
+  const handleLeaveChatFace = async () => {
+    image !== "" &&
+      (await fetch(`${process.env.NEXT_PUBLIC_FLASK_SERVER}logout-with-face`, {
+        method: "POST",
+        headers: {
+          "Content-type": "application/json",
+          "Access-Control-Allow-Origin": "*",
+        },
+        body: JSON.stringify({ imagen: image }),
+      })
+        .then((r) => r.json())
+        .then((r) => r?.status === "ok" && setDisabled(!disabled)));
   };
   const handleLeaveChatRfId = (e) => {
-    e.preventDefault();
-    fetch(
-      `${process.env.NEXT_PUBLIC_FLASK_SERVER}logout-with-rfid?rfid=${rfId}`
-    )
+    // e.preventDefault();
+    capture();
+    fetch(`${process.env.NEXT_PUBLIC_FLASK_SERVER}logout-with-rfid`, {
+      method: "POST",
+      headers: {
+        "Content-type": "application/json",
+      },
+      body: JSON.stringify({ rfId: rfId }),
+    })
       .then((r) => r.json())
       .then((r) => r?.status === "ok" && setDisabled(!disabled));
   };
@@ -94,6 +123,8 @@ const ChatBody = (props) => {
           rfId={rfId}
           setRfId={setRfId}
           router={router}
+          capture={capture}
+          webcamRef={webcamRef}
         ></Modalcito>
       </header>
       <div className={Styles.message__container}>
@@ -142,6 +173,8 @@ const Modalcito = ({
   rfId,
   setRfId,
   router,
+  capture,
+  webcamRef,
 }) => (
   <Modal isOpen={isOpen} onClose={onClose}>
     <ModalOverlay />
@@ -160,6 +193,8 @@ const Modalcito = ({
           router={router}
           text={"Log out"}
           faceText={"Logout with face"}
+          capture={capture}
+          webcamRef={webcamRef}
           actionRfid={handleLeaveChatRfId}
           actionFace={handleLeaveChatFace}
         />

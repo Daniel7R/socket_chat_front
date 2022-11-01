@@ -1,4 +1,10 @@
-import React, { useState, useContext } from "react";
+import React, {
+  useState,
+  useContext,
+  useRef,
+  useCallback,
+  useEffect,
+} from "react";
 import { useRouter } from "next/router";
 import Image from "next/image";
 import { TbFaceId } from "react-icons/tb";
@@ -20,6 +26,7 @@ import Cats from "../assets/images/cats-keyboard.gif";
 import { SocketContext } from "context/SocketContext";
 import Styles from "../styles/Home.module.css";
 import { FormRfidFace } from "./FormRfidFace";
+import { WebcamCapture } from "./WebcamCapture";
 
 const Home = () => {
   const { activeAuth } = useContext(AuthContext);
@@ -28,13 +35,44 @@ const Home = () => {
 
   const router = useRouter();
 
+  //All for webcam functionality
+  const [image, setImage] = useState("");
+
+  const webcamRef = useRef(null);
+
+  const capture = useCallback(() => {
+    const imageSrc = webcamRef.current.getScreenshot();
+    setImage(imageSrc);
+  }, [webcamRef]);
+
+  const [image2, setImage2] = useState("");
+
+  const webcamRef2 = useRef(null);
+
+  const capture2 = useCallback(() => {
+    const imageSrc2 = webcamRef2.current.getScreenshot();
+    setImage2(imageSrc2);
+  }, [webcamRef2]);
+
+  //Web cam ends here
+
   //registro
-  const [id, setId] = useState("");
-  const [nombre, setNombre] = useState("");
-  const [edad, setEdad] = useState("");
-  const [genero, setGenero] = useState("");
-  const [estrato, setEstrato] = useState("");
-  const [departamento, setDepartamento] = useState("");
+  const [fieldsRegister, setFieldsRegister] = useState({
+    id: "",
+    nombre: "",
+    edad: "",
+    genero: "",
+    estrato: "",
+    departamento: "",
+    rfId: "",
+    imagen: "",
+  });
+  // const [id, setId] = useState("");
+  // const [nombre, setNombre] = useState("");
+  // const [edad, setEdad] = useState("");
+  // const [genero, setGenero] = useState("");
+  // const [estrato, setEstrato] = useState("");
+  // const [departamento, setDepartamento] = useState("");
   const [rfId, setRfId] = useState("");
   const [errorR, setErrorR] = useState(false);
   const [errorF, setErrorF] = useState(false);
@@ -43,13 +81,19 @@ const Home = () => {
 
   const { isOpen, onClose, onOpen } = useDisclosure();
 
-  const [user, setUser] = React.useState("");
-  const [header, setHeader] = React.useState("");
+  const [user, setUser] = useState("");
+  const [header, setHeader] = useState("");
 
   const handleLoginWithRfid = (e) => {
     e.preventDefault();
 
-    fetch(`${process.env.NEXT_PUBLIC_FLASK_SERVER}login-with-rfid?rfid=${rfId}`)
+    fetch(`${process.env.NEXT_PUBLIC_FLASK_SERVER}login-with-rfid`, {
+      method: "POST",
+      headers: {
+        "Content-type": "application/json",
+      },
+      body: JSON.stringify({ rfId }),
+    })
       .then((r) => r.json())
       .then((r) => {
         console.log(r);
@@ -74,58 +118,71 @@ const Home = () => {
       .catch((r) => console.log(r));
   };
 
-  const handleLoginWithFace = (e) => {
-    e.preventDefault();
-
-    fetch(`${process.env.NEXT_PUBLIC_FLASK_SERVER}login-with-face`)
-      .then((r) => r.json())
-      .then((r) => {
-        if (r?.status === "ok") {
-          setUser(r?.data);
-          activeAuth();
-          socket.emit("newUser", {
-            username: r?.data,
-            socketID: socket?.id,
-          });
-          setHeader("Welcome");
-          localStorage.setItem("user", r?.data);
-          onOpen();
-          setTimeout(() => {
-            router.push("/chat");
-          }, 2500);
-        } else {
-          setHeader("Error");
-          onOpen();
-        }
+  const handleLoginWithFace = async (e) => {
+    capture();
+    image !== "" &&
+      fetch(`${process.env.NEXT_PUBLIC_FLASK_SERVER}login-with-face`, {
+        method: "POST",
+        headers: {
+          "Content-type": "application/json",
+          "Access-Control-Allow-Origin": "*",
+        },
+        body: JSON.stringify({ imagen: image }),
       })
+        .then((r) => r.json())
+        .then((r) => {
+          if (r?.status === "ok") {
+            setUser(r?.data);
+            activeAuth();
+            socket.emit("newUser", {
+              username: r?.data,
+              socketID: socket?.id,
+            });
+            setHeader("Welcome");
+            localStorage.setItem("user", r?.data);
+            onOpen();
+            setTimeout(() => {
+              router.push("/chat");
+            }, 2500);
+          } else {
+            setHeader("Error");
+            onOpen();
+          }
+        })
 
-      .catch((r) => {
-        setErrorF(r?.status);
-      });
+        .catch((r) => {
+          setErrorF(r?.status);
+        });
   };
 
   const handleRegister = (e) => {
     e.preventDefault();
-
+    setFieldsRegister({ ...fieldsRegister, imagen: image2 });
+    console.log(fieldsRegister.departamento);
     //Fetch para el registro
-
-    fetch(
-      `${process.env.NEXT_PUBLIC_FLASK_SERVER}register?id=${id}&name=${nombre}&edad=${edad}&genero=${genero}&estrato=${estrato}&departamento=${departamento}&rfid=${rfId}`
-    )
-      .then((r) => r.json())
-      .then((r) => {
-        activeAuth();
-        socket.emit("newUser", {
-          username: nombre,
-          socketID: socket?.id,
-        });
-        localStorage.setItem("user", nombre);
-
-        r.status === "Done" ? router.push("/chat") : console.log(r);
+    fieldsRegister.imagen !== "" &&
+      fetch(`${process.env.NEXT_PUBLIC_FLASK_SERVER}register`, {
+        method: "POST",
+        headers: {
+          "Content-type": "application/json",
+          "Access-Control-Allow-Origin": "*",
+        },
+        body: JSON.stringify(fieldsRegister),
       })
-      .catch((e) => {
-        setErrorR("Ha ocurrido un error, verifica todos los campos");
-      });
+        .then((r) => r.json())
+        .then((r) => {
+          activeAuth();
+          socket.emit("newUser", {
+            username: fieldsRegister?.nombre,
+            socketID: socket?.id,
+          });
+          localStorage.setItem("user", fieldsRegister?.nombre);
+
+          r.status === "Done" ? router.push("/chat") : console.log(r);
+        })
+        .catch((e) => {
+          setErrorR("Ha ocurrido un error, verifica todos los campos");
+        });
   };
 
   return (
@@ -167,10 +224,12 @@ const Home = () => {
                 socket={socket}
                 errorL={errorL}
                 setErrorL={setErrorL}
+                capture={capture}
+                webcamRef={webcamRef}
                 errorF={errorF}
                 setErrorF={setErrorF}
-                rfId={rfId}
-                setRfId={setRfId}
+                fields={fieldsRegister}
+                setFields={setFieldsRegister}
                 router={router}
                 text={"Sign in with RFid"}
                 faceText="Request Face access"
@@ -180,6 +239,8 @@ const Home = () => {
                 actionRfid={handleLoginWithRfid}
                 actionFace={handleLoginWithFace}
                 onOpen={onOpen}
+                rfId={rfId}
+                setRfId={setRfId}
                 isOpen={isOpen}
                 onClose={onClose}
               />
@@ -209,8 +270,13 @@ const Home = () => {
                   name="nombre"
                   id="nombre"
                   className={`${Styles.usernameInput}`}
-                  value={nombre}
-                  onChange={(e) => setNombre(e.target.value)}
+                  value={fieldsRegister.nombre}
+                  onChange={(e) =>
+                    setFieldsRegister({
+                      ...fieldsRegister,
+                      nombre: e.target.value,
+                    })
+                  }
                 />
                 <div style={{ display: "flex", justifyContent: "center" }}>
                   <div
@@ -227,8 +293,13 @@ const Home = () => {
                       name="id"
                       id="id"
                       className={`${Styles.usernameInput}`}
-                      value={id}
-                      onChange={(e) => setId(e.target.value)}
+                      value={fieldsRegister.id}
+                      onChange={(e) =>
+                        setFieldsRegister({
+                          ...fieldsRegister,
+                          id: e.target.value,
+                        })
+                      }
                     />
                   </div>
                   <div
@@ -245,8 +316,13 @@ const Home = () => {
                       name="estrato"
                       id="estrato"
                       className={`${Styles.usernameInput}`}
-                      value={estrato}
-                      onChange={(e) => setEstrato(e.target.value)}
+                      value={fieldsRegister.estrato}
+                      onChange={(e) =>
+                        setFieldsRegister({
+                          ...fieldsRegister,
+                          estrato: e.target.value,
+                        })
+                      }
                     />
                   </div>
                 </div>
@@ -265,8 +341,13 @@ const Home = () => {
                       name="edad"
                       id="edad"
                       className={`${Styles.usernameInput}`}
-                      value={edad}
-                      onChange={(e) => setEdad(e.target.value)}
+                      value={fieldsRegister.edad}
+                      onChange={(e) =>
+                        setFieldsRegister({
+                          ...fieldsRegister,
+                          edad: e.target.value,
+                        })
+                      }
                     />
                   </div>
                   <div
@@ -283,8 +364,13 @@ const Home = () => {
                       name="genero"
                       id="genero"
                       className={`${Styles.usernameInput}`}
-                      value={genero}
-                      onChange={(e) => setGenero(e.target.value)}
+                      value={fieldsRegister.genero}
+                      onChange={(e) =>
+                        setFieldsRegister({
+                          ...fieldsRegister,
+                          genero: e.target.value,
+                        })
+                      }
                     />
                   </div>
                 </div>
@@ -303,8 +389,13 @@ const Home = () => {
                       name="departamento"
                       id="departamento"
                       className={`${Styles.usernameInput}`}
-                      value={departamento}
-                      onChange={(e) => setDepartamento(e.target.value)}
+                      value={fieldsRegister.departamento}
+                      onChange={(e) =>
+                        setFieldsRegister({
+                          ...fieldsRegister,
+                          departamento: e.target.value,
+                        })
+                      }
                     />
                   </div>
                   <div
@@ -321,13 +412,23 @@ const Home = () => {
                       name="rfid"
                       id="rfid"
                       placeholder="Here will be your RFid"
-                      value={rfId}
-                      onChange={(e) => setRfId(e.target.value)}
+                      value={fieldsRegister.rfId}
+                      onChange={(e) =>
+                        setFieldsRegister({
+                          ...fieldsRegister,
+                          rfId: e.target.value,
+                        })
+                      }
                       onCopy={false}
                     />
                   </div>
                 </div>
-
+                <div id="cContainer">
+                  <WebcamCapture webcamRef={webcamRef2} />
+                  <button type="button" onClick={capture2}>
+                    Tomar foto
+                  </button>
+                </div>
                 <h3
                   style={{
                     textAlign: "center",
