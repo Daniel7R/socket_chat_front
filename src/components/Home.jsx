@@ -163,10 +163,10 @@ const Home = () => {
     fieldsRegister.imagen !== "" &&
       fetch(`${process.env.NEXT_PUBLIC_FLASK_SERVER}register`, {
         method: "POST",
+        mode: "no-cors",
         headers: {
           "Content-type": "application/json",
           "Access-Control-Allow-Origin": "*",
-          mode: "no-cors",
         },
         body: JSON.stringify(fieldsRegister),
       })
