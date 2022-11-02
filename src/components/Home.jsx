@@ -125,7 +125,9 @@ const Home = () => {
         method: "POST",
         headers: {
           "content-type": "application/json",
+          // "Access-Control-Allow-Origin": "*",
         },
+        // mode: "no-cors",
         body: JSON.stringify({ imagen: image }),
       })
         .then((r) => r.json())
@@ -157,12 +159,11 @@ const Home = () => {
   const handleRegister = (e) => {
     e.preventDefault();
     setFieldsRegister({ ...fieldsRegister, imagen: image2 });
-    console.log(fieldsRegister.departamento);
     //Fetch para el registro
     fieldsRegister.imagen !== "" &&
       fetch(`${process.env.NEXT_PUBLIC_FLASK_SERVER}register`, {
         method: "POST",
-        mode: "no-cors",
+        // mode: "no-cors",
         headers: {
           "Content-type": "application/json",
           "Access-Control-Allow-Origin": "*",
