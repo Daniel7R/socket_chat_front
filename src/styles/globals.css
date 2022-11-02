@@ -15,6 +15,10 @@ a {
   box-sizing: border-box;
 }
 
+#cContainer {
+  text-align: center;
+}
+
 #cContainer > div> video {
   position: static;
   border-radius: 8px;

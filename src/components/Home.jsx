@@ -426,7 +426,17 @@ const Home = () => {
                 </div>
                 <div id="cContainer">
                   <WebcamCapture webcamRef={webcamRef2} />
-                  <button type="button" onClick={capture2}>
+                  <button
+                    style={{
+                      background: "rgb(90 245 159)",
+                      opacity: "0.9",
+                      padding: "8px",
+                      marginTop: "7px",
+                      borderRadius: "20px",
+                    }}
+                    type="button"
+                    onClick={capture2}
+                  >
                     Tomar foto
                   </button>
                 </div>
@@ -437,8 +447,7 @@ const Home = () => {
                     color: "#A0C1F7",
                   }}
                 >
-                  Ten en cuenta que en el momento que presiones el botón de
-                  registrar, se te tomará una foto para el reconocimiento facial
+                  Ten en cuenta que debes tomarte la foto a la hora del registro
                 </h3>
                 <button onClick={handleRegister} className={Styles.btn}>
                   Sign Up
