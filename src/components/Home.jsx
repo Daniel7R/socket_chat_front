@@ -124,9 +124,10 @@ const Home = () => {
       fetch(`${process.env.NEXT_PUBLIC_FLASK_SERVER}login-with-face`, {
         method: "POST",
         headers: {
-          "Content-type": "application/json",
-          "Access-Control-Allow-Origin": "*",
+          "content-type": "application/json",
+          // "Access-Control-Allow-Origin": "*",
         },
+        // mode: "no-cors",
         body: JSON.stringify({ imagen: image }),
       })
         .then((r) => r.json())
